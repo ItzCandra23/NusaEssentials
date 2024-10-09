@@ -1,0 +1,47 @@
+{
+	"format_version": 2,
+	"header": {
+		"name": "§2Dwipa§dEssentials",
+		"description": "§bhttps://discord.gg/RKtMh7JECV§a for more updates and information!",
+		"uuid": "3f77f5a5-51a6-4952-8bd1-2d9637eee81a",
+		"version": [
+			0,
+			1,
+			0
+		],
+		"min_engine_version": [
+			1,
+			21,
+			31
+		]
+	},
+	"modules": [
+		{
+			"type": "data",
+			"uuid": "cb9f75a3-631c-4f07-9e82-cc59df2d6c6f",
+			"version": [
+				1,
+				0,
+				0
+			]
+		},
+		{
+			"description": "",
+			"uuid": "9d1ab975-bf70-435a-a1e2-81f024a130b1",
+			"version": "1.1.0-beta",
+			"type": "script",
+			"language": "javascript",
+			"entry": "scripts/index.js"
+		}
+	],
+	"dependencies": [
+		{
+            "module_name": "@minecraft/server",
+            "version": "1.15.0-beta"
+        },
+		{
+            "module_name": "@minecraft/server-ui",
+            "version": "1.4.0-beta"
+        }
+	]
+}
