@@ -2,7 +2,7 @@ import { system, world } from "@minecraft/server";
 
 namespace Database {
     
-    export function set(name: string, data?: any): void {
+    export function set<T = any>(name: string, data?: T): void {
         // return new Promise((resolve) => {
         //     system.run(() => {
                 if (data === undefined || data === null) world.setDynamicProperty(name);

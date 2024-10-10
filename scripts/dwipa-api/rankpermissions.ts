@@ -1,34 +1,343 @@
+import { system } from "@minecraft/server";
 import Database from "./database";
 
 export interface RankData {
     display: string;
+    format: {
+        chat: string;
+        nameTag: string;
+    };
     permissions: string[];
 }
 
-export class RankPerms {
+class RankPerms {
 
+    /**Get All Raw Rank Data */
     static getRawRanks(): Record<string, RankData> {
-        return Database.get<Record<string, RankData>>("ranks") ?? {};
+        return Database.get<Record<string, RankData>>("ranks") ?? {
+            Member: {
+                display: "§eMember",
+                format: {
+                    nameTag: "§2[{display}§r§2] {player}",
+                    chat: "§7[§r{display}§r§7] {player}:§r {message}",
+                },
+                permissions: [],
+            }
+        };
     }
 
-    static createRank(rankId: string, display: string = rankId, permissions: string[] = []): RankPerms|null {
-        let ranks = this.getRawRanks();
-        const idRegex = /^[a-zA-Z0-9]+$/;
-        const permRegex = /^[a-zA-Z0-9\.]+$/;
+    /**
+     * Create Rank
+     * @param rankId Rank Id
+     * @param display Name Display
+     * @param permissions Rank Permissions Access
+     * @throws "error.invalid" Invalid Rank Id characters or Rank Id exceeds 20 characters
+     * @throws "error.invalid.display" Invalid Rank Display not found
+     * @throws "error.already" Rank Id Already
+     * @returns (RankPerms) -- Success to create
+     */
+    static createRank(rankId: string, display: string = rankId, permissions: string[] = []): Promise<RankPerms> {
+        return new Promise((resolve, reject) => system.run(() => {
+            let ranks = RankPerms.getRawRanks();
+            const idRegex = /^[a-zA-Z0-9]+$/;
+            const permRegex = /^[a-zA-Z0-9\.]+$/;
+            
+            if (!idRegex.test(rankId) || rankId.length > 24) reject("error.invalid");
+            if (Object.keys(ranks).some(key => key.toLowerCase() === rankId.toLowerCase())) reject("error.already");
+            if (display === "" || display === " ".repeat(display.length)) reject("error.invalid.display");
+
+            let data: RankData = {
+                display,
+                format: {
+                    nameTag: "§2[{display}§r§2] {player}",
+                    chat: "§7[§r{display}§r§7] §8{player}:§r {message}",
+                },
+                permissions: permissions.filter((v) => !permRegex.test(v)),
+            };
+
+            ranks[rankId] = data;
+            Database.set<Record<string, RankData>>("ranks", ranks);
+
+            resolve(new RankPerms(rankId));
+        }));
+    }
+
+    /**
+     * Delete Rank
+     * @param rankId Rank Id
+     * @throws "error.notfound" Rank Id not found
+     * @throws "error.access" Cant delete default rank
+     * @returns (void) -- Success to delete
+     */
+    static deleteRank(rankId: string): Promise<void> {
+        return new Promise((resolve, reject) => system.run(() => {
+            let ranks = RankPerms.getRawRanks();
+            if (!ranks.hasOwnProperty(rankId)) reject("error.notfound");
+            if (Object.keys(ranks)[0] === rankId) reject("error.access");
+            
+            delete ranks[rankId];
+            Database.set<Record<string, RankData>>("ranks", ranks);
+
+            resolve();
+        }));
+    }
+
+    /**
+     * Get Rank Display
+     * @param rankId Rank Id
+     * @returns (string) -- Rank Display or ("") if Rank not found
+     */
+    static getDisplay(rankId: string): string {
+        let ranks = RankPerms.getRawRanks();
+        let rank = ranks[rankId];
+
+        if (!rank) return "";
+        return rank.display;
+    }
+
+    /**
+     * Set Rank Display
+     * @param rankId Rank Id
+     * @param display Name Display
+     * @throws "error.notfound" Rank Id not found
+     * @throws "error.invalid" Invalid Rank Display
+     * @returns (void) -- Success to set display
+     */
+    static setDisplay(rankId: string, display: string): Promise<void> {
+        return new Promise((resolve, reject) => system.run(() => {
+            let ranks = RankPerms.getRawRanks();
+            let rank = ranks[rankId];
+
+            if (!rank) reject("error.notfound");
+            if (display === "" || display === " ".repeat(display.length)) reject("error.invalid");
+
+            rank.display = display;
+            Database.set<Record<string, RankData>>("ranks", ranks);
+
+            resolve();
+        }));
+    }
+
+    /**
+     * Get Raw Rank Format Chat
+     * @param rankId Rank Id
+     * @returns (string) -- Format Chat or ("") if Rank not found
+     */
+    static getFormatChat(rankId: string): string {
+        let ranks = RankPerms.getRawRanks();
+        let rank = ranks[rankId];
+
+        if (!rank) return "";
+        return rank.format.chat;
+    }
+
+    /**
+     * Set Raw Rank Format Chat
+     * @param rankId Rank Id
+     * @param format Chat Format
+     * @throws "error.notfound" Rank Id not found
+     * @throws "error.invalid" Invalid Rank Format
+     * @returns (void) -- Success to set format
+     */
+    static setFormatChat(rankId: string, format: string): Promise<void> {
+        return new Promise((resolve, reject) => system.run(() => {
+            let ranks = RankPerms.getRawRanks();
+            let rank = ranks[rankId];
+
+            if (!rank) reject("error.notfound");
+            if (format === "" || format === " ".repeat(format.length)) reject("error.invalid");
+
+            rank.format.chat = format;
+            Database.set<Record<string, RankData>>("ranks", ranks);
+
+            resolve();
+        }));
+    }
+
+    /**
+     * Get Raw Rank Format NameTag
+     * @param rankId Rank Id
+     * @returns (string) -- Format NameTag or ("") if Rank not found
+     */
+    static getFormatNameTag(rankId: string): string {
+        let ranks = RankPerms.getRawRanks();
+        let rank = ranks[rankId];
+
+        if (!rank) return "";
+        return rank.format.nameTag;
+    }
+
+    /**
+     * Set Raw Rank Format nameTag
+     * @param rankId Rank Id
+     * @param format NameTag Format
+     * @throws "error.notfound" Rank Id not found
+     * @throws "error.invalid" Invalid Rank Format
+     * @returns (void) -- Success to set format
+     */
+    static setFormatNameTag(rankId: string, format: string): Promise<void> {
+        return new Promise((resolve, reject) => system.run(() => {
+            let ranks = RankPerms.getRawRanks();
+            let rank = ranks[rankId];
+
+            if (!rank) reject("error.notfound");
+            if (format === "" || format === " ".repeat(format.length)) reject("error.invalid");
+
+            rank.format.nameTag = format;
+            Database.set<Record<string, RankData>>("ranks", ranks);
+
+            resolve();
+        }));
+    }
+
+    /**
+     * Get Rank Permissions
+     * @param rankId Rank Id
+     * @returns (string[]) -- Rank Permissions or ([]) if Rank not found
+     */
+    static getPermissions(rankId: string): string[] {
+        let ranks = RankPerms.getRawRanks();
+        let rank = ranks[rankId];
+
+        if (!rank) return [];
+        return rank.permissions;
+    }
+
+    /**
+     * Add Rank Permissions
+     * @param rankId Rank Id
+     * @param permission Rank Permission
+     * @throws "error.notfound" Rank Id not found
+     * @throws "error.invalid" Invalid Rank Permission
+     * @throws "error.already" Rank Permission already added
+     * @returns (void) -- Added Permission
+     */
+    static addPermission(rankId: string, permission: string): Promise<void> {
+        return new Promise((resolve, reject) => system.run(() => {
+            const regex = /^[a-zA-Z0-9\.]+$/;
+            let ranks = RankPerms.getRawRanks();
+            let rank = ranks[rankId];
+
+            if (!rank) reject("error.notfound");
+            if (!regex.test(permission)) reject("error.invalid");
+            if (rank.permissions.some((v) => v.toLowerCase() === permission.toLowerCase())) reject("error.already");
+
+            rank.permissions.push(permission);
+            Database.set<Record<string, RankData>>("ranks", ranks);
+
+            resolve();
+        }));
+    }
+
+    /**
+     * Remove Rank Permissions
+     * @param rankId Rank Id
+     * @param permission Rank Permission
+     * @throws "error.notfound" Rank Id not found
+     * @throws "error.notfound.permission" Rank Permission not found
+     * @returns (void) -- Deleted Permission
+     */
+    static removePermission(rankId: string, permission: string): Promise<void> {
+        return new Promise((resolve, reject) => system.run(() => {
+            let ranks = RankPerms.getRawRanks();
+            let rank = ranks[rankId];
+
+            if (!rank) reject("error.notfound");
+            if (!rank.permissions.some((v) => v.toLowerCase() === permission.toLowerCase())) reject("error.notfound.permission");
+
+            rank.permissions = rank.permissions.filter((v) => v.toLowerCase() !== permission.toLowerCase());
+            Database.set<Record<string, RankData>>("ranks", ranks);
+
+            resolve();
+        }));
+    }
+
+    /**
+     * Set Rank Permissions
+     * @param rankId Rank Id
+     * @param target Target Rank Permission
+     * @param permission Rank Permission
+     * @throws "error.notfound" Rank Id not found
+     * @throws "error.notfound.permission" Rank Permission not found
+     * @throws "error.invalid.permission" Invalid Rank Permission
+     * @returns (void) -- Deleted Permission
+     */
+    static setPermission(rankId: string, target: string, permission: string): Promise<void> {
+        return new Promise((resolve, reject) => system.run(() => {
+            let ranks = RankPerms.getRawRanks();
+            let rank = ranks[rankId];
+            if (!rank) reject("error.notfound");
+
+            const regex = /^[a-zA-Z0-9\.]+$/;
+            const targetIndex = rank.permissions.findIndex((v) => v.toLowerCase() === target.toLowerCase());
+
+            if (targetIndex === -1) reject("error.notfound.permission");
+            if (!regex.test(permission)) reject("error.invalid.permission");
+            if (rank.permissions.some((v) => v.toLowerCase() === permission.toLowerCase())) reject("error.already");
+
+            rank.permissions[targetIndex] = permission;
+            Database.set<Record<string, RankData>>("ranks", ranks);
+
+            resolve();
+        }));
+    }
+
+    getRank(rankId: string): RankPerms|null {
+        const _rankId = Object.keys(RankPerms.getRawRanks()).find((v) => v.toLowerCase() === rankId.toLowerCase());
         
-        if (!idRegex.test(rankId) || rankId.length > 24) return null;
-        if (ranks.hasOwnProperty(rankId)) return null;
-
-        let data: RankData = {
-            display,
-            permissions: permissions.filter((v) => !permRegex.test(v)),
-        };
-
-        ranks[rankId] = data;
-        Database.set("ranks", ranks);
-
+        if (!_rankId) return null;
         return new RankPerms(rankId);
     }
 
-    constructor(rankId: string) {}
+    constructor(public rankId: string) {}
+
+    getRankId(): string {
+        return Object.keys(RankPerms.getRawRanks()).find((v) => v.toLowerCase() === this.rankId.toLowerCase()) ?? this.rankId;
+    }
+
+    getDisplay(): string {
+        return RankPerms.getDisplay(this.rankId);
+    }
+
+    setDisplay(display: string) {
+        return RankPerms.setDisplay(this.rankId, display);
+    }
+
+    getFormatChat(): string {
+        return RankPerms.getFormatChat(this.rankId);
+    }
+
+    getFormatNameTag(): string {
+        return RankPerms.getFormatNameTag(this.rankId);
+    }
+
+    setFormatChat(format: string) {
+        return RankPerms.setFormatChat(this.rankId, format);
+    }
+
+    setFormatNameTag(format: string) {
+        return RankPerms.setFormatNameTag(this.rankId, format);
+    }
+
+    getPermissions(): string[] {
+        return RankPerms.getPermissions(this.rankId);
+    }
+
+    addPermission(permission: string) {
+        return RankPerms.addPermission(this.rankId, permission);
+    }
+
+    removePermission(permission: string) {
+        return RankPerms.removePermission(this.rankId, permission);
+    }
+
+    setPermission(target: string, permission: string) {
+        return RankPerms.setPermission(this.rankId, target, permission);
+    }
+
+    destruct() {
+        this.rankId = "";
+    }
 }
+
+export default RankPerms;
