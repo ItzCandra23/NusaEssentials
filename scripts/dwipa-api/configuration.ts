@@ -3,9 +3,12 @@ import Database from "./database";
 
 namespace NusaConfiguration {
 
-    
+    export function register<T = any>(path: string, value: T): void {
+        if (typeof getConfig(path) !== "undefined" && typeof getConfig(path) === typeof value) return;
+        setConfig(path, value);
+    }
 
-    export function setConfig(path: string, value: any): Promise<void> {
+    export function setConfig<T = any>(path: string, value: T): Promise<void> {
         return new Promise((resolve) => {
             system.run(async () => {
                 let nusaConfig = Database.get("nusa-config");
@@ -16,10 +19,10 @@ namespace NusaConfiguration {
         });
     }
     
-    export function getConfig(path: string = "") {
+    export function getConfig<T = any>(path: string = ""): T|null {
         const nusaConfig = Database.get("nusa-config");
         
-        if (typeof nusaConfig === "undefined") return undefined;
+        if (typeof nusaConfig === "undefined") return null;
         return getArray(nusaConfig, path);
     }
 

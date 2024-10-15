@@ -1,4 +1,4 @@
-import { Player, system } from "@minecraft/server";
+import { Player, system, world } from "@minecraft/server";
 import Database from "./database";
 import PlayerData from "./player";
 import RankPerms from "./rankpermissions";
@@ -143,5 +143,9 @@ class PlayerRank {
         });
     }
 }
+
+system.runInterval(() => {
+    for (const player of world.getAllPlayers()) try { PlayerRank.updatePlayerName(player); } catch(err) {}
+}, 10);
 
 export default PlayerRank;

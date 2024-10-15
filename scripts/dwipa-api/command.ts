@@ -26,6 +26,8 @@ export interface CustomCommandData {
 
 type CommandParameters = "player"|"playerid"|"string"|"number"|"boolean"|string[]|Record<string, string|number|boolean|Vector3>;
 
+NusaConfiguration.register("command_prefix", "!");
+
 const cmdEvent = new EventEmitter();
 const commands = new Map<string, CustomCommandData>();
 
@@ -144,11 +146,11 @@ export const command = {
                     if (type[0] === "number") {
                         let number = Number(value);
                         if (number !== number) {
-                            player.sendMessage(Translate.translate("command.error.params", ["{error}", `${command.prefix() + _command.name + " " + Object.entries(params).map(([key, v]) => {
+                            Translate.sendTranslate(player, "command.error.params", ["{error}", `${command.prefix() + _command.name + " " + Object.entries(params).map(([key, v]) => {
                                 if (typeof v === "object" && v instanceof Player) return v.name;
                                 else if (typeof v === "string" && _parameters[key][0] === "playerid") return PlayerData.getPlayerName(v);
                                 else return v;
-                            }).join(" ")} >>${value}<<`]));
+                            }).join(" ")} >>${value}<<`]);
                             return;
                         }
                         else {
@@ -175,11 +177,11 @@ export const command = {
                         else if (type[0] === "boolean") {
                             const bool = (value.toLowerCase() === "true" ? true : value.toLowerCase() === "false" ? false : undefined);
                             if (bool === undefined) {
-                                player.sendMessage(Translate.translate("command.error.params", ["{error}", `${command.prefix() + _command.name + " " + Object.entries(params).map(([key, v]) => {
+                                Translate.sendTranslate(player, "command.error.params", ["{error}", `${command.prefix() + _command.name + " " + Object.entries(params).map(([key, v]) => {
                                     if (typeof v === "object" && v instanceof Player) return v.name;
                                     else if (typeof v === "string" && _parameters[key][0] === "playerid") return PlayerData.getPlayerName(v);
                                     else return v;
-                                }).join(" ")} >>${value}<<`]));
+                                }).join(" ")} >>${value}<<`]);
                                 return;
                             }
                             params[param]=bool;
@@ -187,22 +189,22 @@ export const command = {
                         else if (typeof type[0] === "object" && Array.isArray(type[0])) {
                             const index = type[0].findIndex((v) => v.toLowerCase() === value.toLowerCase());
                             if (index < 0) {
-                                player.sendMessage(Translate.translate("command.error.params", ["{error}", `${command.prefix() + _command.name + " " + Object.entries(params).map(([key, v]) => {
+                                Translate.sendTranslate(player, "command.error.params", ["{error}", `${command.prefix() + _command.name + " " + Object.entries(params).map(([key, v]) => {
                                     if (typeof v === "object" && v instanceof Player) return v.name;
                                     else if (typeof v === "string" && _parameters[key][0] === "playerid") return PlayerData.getPlayerName(v);
                                     else return v;
-                                }).join(" ")} >>${value}<<`]));
+                                }).join(" ")} >>${value}<<`]);
                                 return;
                             }
                             params[param]=type[0][index];
                         }
                         else if (typeof type[0] === "object" && !Array.isArray(type[0])) {
                             if (!type[0].hasOwnProperty(value)) {
-                                player.sendMessage(Translate.translate("command.error.params", ["{error}", `${command.prefix() + _command.name + " " + Object.entries(params).map(([key, v]) => {
+                                Translate.sendTranslate(player, "command.error.params", ["{error}", `${command.prefix() + _command.name + " " + Object.entries(params).map(([key, v]) => {
                                     if (typeof v === "object" && v instanceof Player) return v.name;
                                     else if (typeof v === "string" && _parameters[key][0] === "playerid") return PlayerData.getPlayerName(v);
                                     else return v;
-                                }).join(" ")} >>${value}<<`]));
+                                }).join(" ")} >>${value}<<`]);
                                 return;
                             }
                             params[param]=type[0][value];
@@ -211,16 +213,16 @@ export const command = {
                     }
                 }
                 else {
-                    if (Object.values(params).length <= 1) player.sendMessage(Translate.translate("command.error.params", ["{error}", `${command.prefix() + _command.name + " " + Object.entries(params).map(([key, v]) => {
+                    if (Object.values(params).length <= 1) Translate.sendTranslate(player, "command.error.params", ["{error}", `${command.prefix() + _command.name + " " + Object.entries(params).map(([key, v]) => {
                         if (typeof v === "object" && v instanceof Player) return v.name;
                         else if (typeof v === "string" && _parameters[key][0] === "playerid") return PlayerData.getPlayerName(v);
                         else return v;
-                    }).join(" ")} >><<`]));
-                    else player.sendMessage(Translate.translate("command.error.params", ["{error}", `${command.prefix() + _command.name + Object.entries(params).map(([key, v]) => {
+                    }).join(" ")} >><<`]);
+                    else Translate.sendTranslate(player, "command.error.params", ["{error}", `${command.prefix() + _command.name + Object.entries(params).map(([key, v]) => {
                         if (typeof v === "object" && v instanceof Player) return v.name;
                         else if (typeof v === "string" && _parameters[key][0] === "playerid") return PlayerData.getPlayerName(v);
                         else return v;
-                    }).join(" ")} >><<`]));
+                    }).join(" ")} >><<`]);
                     return;
                 }
             }

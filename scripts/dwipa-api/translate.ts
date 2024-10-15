@@ -1,17 +1,24 @@
 import { Player } from "@minecraft/server";
 import { CustomForm, FormDropdown, FormToggle } from "./form-ui";
 import NusaConfiguration from "./configuration";
+
+NusaConfiguration.register("language", {
+    dev_mode: false,
+    v2: true,
+    lang: "en-US",
+});
  
 const langs = new Map<string, Record<string, string>>();
 
 namespace Translate {
 
-    export async function setLanguage(language: string, dev_mode?: boolean, author?: Player): Promise<void> {
+    export async function setLanguage(language: string, v2?: boolean, dev_mode?: boolean, author?: Player): Promise<void> {
         if (!langs.has(language)) {
             author?.sendMessage(Translate.translate("translate.error.notfound"));
             return;
         }
 
+        if (v2 !== undefined) await NusaConfiguration.setConfig("language.v2", v2);
         if (dev_mode !== undefined) await NusaConfiguration.setConfig("language.dev_mode", dev_mode);
         await NusaConfiguration.setConfig("language.lang", language);
         author?.sendMessage(Translate.translate("translate.success.set"));
@@ -22,16 +29,26 @@ namespace Translate {
         const form = new CustomForm("translate.form-ui.setlanguage.title", [
             new FormDropdown("translate.form-ui.setlanguage.contents.languages", languagesArr, languagesArr.findIndex((v) => v === getLanguage())),
             new FormToggle("translate.form-ui.setlanguage.contents.devmode", NusaConfiguration.getConfig("language.dev_mode") ?? false),
+            new FormToggle("translate.form-ui.setlanguage.contents.v2", NusaConfiguration.getConfig("language.v2") ?? true),
         ]);
 
         form.sendTo(player, "translate").then((res) => {
             if (res.formValues === undefined) return;
-            setLanguage(languagesArr[+res.formValues[0]], Boolean(res.formValues[1]), player);
+            setLanguage(languagesArr[+res.formValues[0]], Boolean(res.formValues[2]), Boolean(res.formValues[1]), player);
         });
     }
 
+    export function isDevMode(): boolean {
+        return NusaConfiguration.getConfig("language.dev_mode") ?? false;
+    }
+
+    export function isV2(): boolean {
+        return NusaConfiguration.getConfig("language.v2") ?? true;
+    }
+
     export function getLanguage(): string {
-        if (langs.has(NusaConfiguration.getConfig("language.lang") ?? "en-US")) return NusaConfiguration.getConfig("language.lang");
+        const lang = NusaConfiguration.getConfig("language.lang");
+        if (langs.has(lang ?? "en-US")) return lang;
         else return [...langs.keys()][0];
     }
 
@@ -40,22 +57,35 @@ namespace Translate {
     }
 
     export function createLanguage(language: string, translates: Record<string, string>, author?: string): void {
-        let data = langs.get(language) ?? {};
-        langs.set(language, {...translates, ...data});
+        if (!isV2()) {
+            let data = langs.get(language) ?? {};
+            langs.set(language, {...translates, ...data});
+        } else if (language === getLanguage()) {
+            let data = langs.get("main");
+            langs.set("main", {...translates, ...data});
+        }
     }
 
     export function translate(text: string, replace: [string, string]|[string, string][] = []): string {
-        const translate = langs.get(getLanguage());
-        const devMode: boolean = NusaConfiguration.getConfig("language.dev_mode");
+        if (!isV2()) {
+            const translate = langs.get(getLanguage());
+            const devMode: boolean = NusaConfiguration.getConfig("language.dev_mode") ?? false;
 
-        if (translate && translate.hasOwnProperty(text)) return textReplace(translate[text], replace);
-        if (translate && !translate.hasOwnProperty(text) && devMode) return textReplace(translate[text], replace);
-        if (((translate && !translate.hasOwnProperty(text)) ? true : translate === undefined) && !devMode) {
-            const findtranslate = [...langs.entries()].find(([key, value]) => value.hasOwnProperty(text));
-            if (findtranslate) return textReplace(findtranslate[1][text], replace);
-            else return textReplace(text, replace);
+            if (translate && translate.hasOwnProperty(text)) return textReplace(translate[text], replace);
+            if (translate && !translate.hasOwnProperty(text) && devMode) return textReplace(translate[text], replace);
+            if (((translate && !translate.hasOwnProperty(text)) ? true : translate === undefined) && !devMode) {
+                const findtranslate = [...langs.entries()].find(([key, value]) => value.hasOwnProperty(text));
+                if (findtranslate) return textReplace(findtranslate[1][text], replace);
+                else return textReplace(text, replace);
+            }
+            return textReplace(text, replace);
+        } else {
+            return textReplace((langs.get("main") ?? { text })[text], replace);
         }
-        return textReplace(text, replace);
+    }
+
+    export function sendTranslate(player: Player, text: string, replace: [string, string]|[string, string][] = []): void {
+        player.sendMessage(Translate.translate(text, replace));
     }
 
     // export async function convert(fixReplace: boolean = false): Promise<Map<string, string>> {

@@ -54,13 +54,167 @@ export interface FormItemInput {
 
 export type FormItem = FormItemLabel | FormItemToggle | FormItemSlider | FormItemStepSlider | FormItemDropdown | FormItemInput;
 
+export class FormButton {
+    text: string|RawMessage;
+    constructor(text: string|RawMessage, public imagePath: string = "") {
+        if (typeof text === "string") text=Translate.translate(text);
+
+        this.text=text;
+    }
+
+    destruct() {
+        (this as any).text = null;
+        (this as any).imagePath = null;
+    }
+}
+
+class FormComponent {
+    constructor(public readonly type: string, public text: string|RawMessage) {}
+
+    destruct() {
+        (this as any).text = null;
+        (this as any).type = null;
+    }
+}
+
+/**
+ * @deprecated
+ */
+export class FormLabel extends FormComponent implements FormItemLabel {
+    readonly type = "label";
+    constructor(text: string|RawMessage) {
+        if (typeof text === "string") text=Translate.translate(text);
+
+        super("label", text);
+    }
+
+    destruct() {
+        (this as any).text = null;
+        (this as any).type = null;
+    }
+}
+
+export class FormToggle extends FormComponent implements FormItemToggle {
+    readonly type = "toggle";
+    default: boolean;
+    constructor(text: string|RawMessage, defaultValue?: boolean) {
+        if (typeof text === "string") text=Translate.translate(text);
+
+        super("toggle", text);
+        if (defaultValue) this.default = defaultValue;
+        else this.default=false;
+    }
+
+    destruct() {
+        (this as any).text = null;
+        (this as any).default = null;
+        (this as any).type = null;
+    }
+}
+
+export class FormSlider extends FormComponent implements FormItemSlider {
+    readonly type = "slider";
+    min: number;
+    max: number;
+    step: number;
+    default: number;
+    constructor(text: string|RawMessage, min: number, max: number, step: number, defaultValue?: number) {
+        if (typeof text === "string") text=Translate.translate(text);
+
+        super("slider", text);
+        this.min = min;
+        this.max = max;
+        this.step = step;
+        if (defaultValue) this.default = defaultValue;
+        else this.default=min;
+    }
+
+    destruct() {
+        (this as any).text = null;
+        (this as any).min = null;
+        (this as any).max = null;
+        (this as any).default = null;
+        (this as any).type = null;
+    }
+}
+
+/**
+ * @deprecated
+ */
+export class FormStepSlider extends FormComponent implements FormItemStepSlider {
+    readonly type = "step_slider";
+    steps: (string|RawMessage)[];
+    default: number;
+    constructor(text: string|RawMessage, steps: (string|RawMessage)[], defaultIndex?: number) {
+        if (typeof text === "string") text=Translate.translate(text);
+        if (steps.find((v) => typeof v === "string")) steps=steps.map((v) => {
+            if (typeof v === "string") return Translate.translate(v);
+            return v;
+        });
+        
+        super("step_slider", text);
+        this.steps = steps;
+        if (defaultIndex) this.default = defaultIndex;
+        else this.default=0;
+    }
+
+    destruct() {
+        (this as any).text = null;
+        (this as any).steps = null;
+        (this as any).default = null;
+        (this as any).type = null;
+    }
+}
+
+export class FormDropdown extends FormComponent implements FormItemDropdown {
+    readonly type = "dropdown";
+    options: (string|RawMessage)[];
+    default: number;
+    constructor(text: string|RawMessage, options: (string|RawMessage)[], defaultIndex?: number) {
+        if (typeof text === "string") text=Translate.translate(text);
+        if (options.find((v) => typeof v === "string")) options=options.map((v) => {
+            if (typeof v === "string") return Translate.translate(v);
+            return v;
+        });
+
+        super("dropdown", text);
+        this.options = options;
+        if (defaultIndex) this.default = defaultIndex;
+        else this.default=0;
+    }
+
+    destruct() {
+        (this as any).text = null;
+        (this as any).options = null;
+        (this as any).default = null;
+        (this as any).type = null;
+    }
+}
+
+export class FormInput extends FormComponent implements FormItemInput {
+    readonly type = "input";
+    placeholder: string|RawMessage;
+    default?: string;
+    constructor(text: string|RawMessage, placeholder: string|RawMessage, defaultValue?: string) {
+        if (typeof text === "string") text=Translate.translate(text);
+        if (typeof placeholder === "string") placeholder=Translate.translate(placeholder);
+        if (typeof defaultValue === "string") defaultValue=Translate.translate(defaultValue);
+
+        super("input", text);
+        this.placeholder = placeholder;
+        this.default = defaultValue;
+    }
+
+    destruct() {
+        (this as any).text = null;
+        (this as any).placeholder = null;
+        (this as any).default = null;
+        (this as any).type = null;
+    }
+}
+
 const PlayerBusyList = new Map<string, number>();
 const TextureItems = new Map<string, [string, boolean]>();
-
-export namespace FormItem {
-    
-    export function FormButton()
-}
 
 export class ChestForm {
 
@@ -170,7 +324,7 @@ export class SimpleForm {
     private data;
     private labels = new Map<number, string>();
 
-    constructor(title: string|RawMessage = "", content: string|RawMessage = "", buttons: FormItemButton[] = []) {
+    constructor(title: string|RawMessage = "", content: string|RawMessage = "", buttons: FormButton[] = []) {
         this.data={
             title,
             content,
@@ -194,18 +348,18 @@ export class SimpleForm {
         this.data.content = content;
     }
 
-    addButton(button: FormItemButton, label?: string): void {
+    addButton(button: FormButton, label?: string): void {
         this.data.buttons!.push(button);
         if (label) this.labels.set(this.data.buttons!.length - 1, label);
     }
 
-    getButton(indexOrLabel: string | number): FormItemButton | null {
+    getButton(indexOrLabel: string | number): FormButton | null {
         if (typeof indexOrLabel === "string") {
             for (const [index, label] of this.labels) {
-                if (label === indexOrLabel) return this.data.buttons![index] as FormItemButton;
+                if (label === indexOrLabel) return this.data.buttons![index] as FormButton;
             }
         } else {
-            return this.data.buttons![indexOrLabel];
+            return this.data.buttons![indexOrLabel] as FormButton;
         }
         return null;
     }
@@ -219,7 +373,7 @@ export class SimpleForm {
         form.title(this.data.title);
         form.body(this.data.content);
 
-        this.data.buttons.forEach((button) => form.button(button.text, button.image));
+        this.data.buttons.forEach((button) => form.button(button.text, button.imagePath));
 
         return new Promise((resolve, reject) => {
             system.run(async () => {
@@ -401,7 +555,7 @@ export class CustomForm {
     private data;
     private labels = new Map<number, string>();
 
-    constructor(title: string|RawMessage = "", content: FormItem[] = []) {
+    constructor(title: string|RawMessage = "", content: FormComponent[] = []) {
         this.data={
             title,
             content: content as FormItem[],
@@ -416,18 +570,18 @@ export class CustomForm {
         this.data.title = title;
     }
 
-    addComponent(component: FormItem, label?: string): void {
-        this.data.content.push(component);
+    addComponent(component: FormComponent, label?: string): void {
+        (this.data.content as FormComponent[]).push(component);
         if (label) this.labels.set(this.data.content!.length - 1, label);
     }
 
-    getComponent(indexOrLabel: string | number): FormItem | null {
+    getComponent(indexOrLabel: string | number): FormComponent | null {
         if (typeof indexOrLabel === "string") {
             for (const [index, label] of this.labels) {
-                if (label === indexOrLabel) return (this.data.content as FormItem[])[index];
+                if (label === indexOrLabel) return (this.data.content as FormComponent[])[index];
             }
         } else {
-            return (this.data.content as FormItem[])[indexOrLabel];
+            return (this.data.content as FormComponent[])[indexOrLabel];
         }
         return null;
     }
