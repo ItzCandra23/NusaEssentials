@@ -1,5 +1,5 @@
 import { Player } from "@minecraft/server";
-import { CustomForm, FormDropdown, FormToggle } from "./form-ui";
+import { CustomForm, FormItems } from "./form-ui";
 import NusaConfiguration from "./configuration";
 
 NusaConfiguration.register("language", {
@@ -27,9 +27,9 @@ namespace Translate {
     export function setLanguageUI(player: Player) {
         let languagesArr = getLanguages();
         const form = new CustomForm("translate.form-ui.setlanguage.title", [
-            new FormDropdown("translate.form-ui.setlanguage.contents.languages", languagesArr, languagesArr.findIndex((v) => v === getLanguage())),
-            new FormToggle("translate.form-ui.setlanguage.contents.devmode", NusaConfiguration.getConfig("language.dev_mode") ?? false),
-            new FormToggle("translate.form-ui.setlanguage.contents.v2", NusaConfiguration.getConfig("language.v2") ?? true),
+            FormItems.FormDropdown("translate.form-ui.setlanguage.contents.languages", languagesArr, languagesArr.findIndex((v) => v === getLanguage())),
+            FormItems.FormToggle("translate.form-ui.setlanguage.contents.devmode", NusaConfiguration.getConfig("language.dev_mode") ?? false),
+            FormItems.FormToggle("translate.form-ui.setlanguage.contents.v2", NusaConfiguration.getConfig("language.v2") ?? true),
         ]);
 
         form.sendTo(player, "translate").then((res) => {
@@ -47,9 +47,11 @@ namespace Translate {
     }
 
     export function getLanguage(): string {
-        const lang = NusaConfiguration.getConfig("language.lang");
-        if (langs.has(lang ?? "en-US")) return lang;
-        else return [...langs.keys()][0];
+        const lang = NusaConfiguration.getConfig("language.lang") ?? "en-US";
+        if (!isV2()) {
+            if (langs.has(lang)) return lang;
+            else return [...langs.keys()][0];
+        } else return lang;
     }
 
     export function getLanguages(): string[] {
@@ -80,7 +82,7 @@ namespace Translate {
             }
             return textReplace(text, replace);
         } else {
-            return textReplace((langs.get("main") ?? { text })[text], replace);
+            return textReplace((langs.get("main") ?? {})[text] ?? text, replace);
         }
     }
 

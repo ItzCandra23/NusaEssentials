@@ -57,9 +57,9 @@ class PlayerRank {
      * Set Player Rank
      * @param playerId player Id
      * @param rankId Rank Id
-     * @throws "playerrank.setplayer.error.notfound" Player Id not found
-     * @throws "playerrank.setplayer.error.notfound.rank" Rank Id not found
-     * @throws "playerrank.setplayer.error.already" Player Rank same with Rank Id
+     * @throws "playerrank.error.notfound.player" Player Id not found
+     * @throws "playerrank.error.notfound.rank" Rank Id not found
+     * @throws "playerrank.error.already" Player Rank same with Rank Id
      * @returns (void) -- Success to set
      */
     static setPlayer(playerId: string, rankId: string): Promise<void> {
@@ -67,9 +67,9 @@ class PlayerRank {
             let ranks = Object.keys(RankPerms.getRawRanks());
             let dataplayers = PlayerRank.getPlayers();
 
-            if (!PlayerData.getPlayerName(playerId)) reject("playerrank.setplayer.error.notfound");
-            if (!ranks.hasOwnProperty(rankId)) reject("playerrank.setplayer.error.notfound.rank");
-            if (PlayerRank.getRankId(playerId) === rankId) reject("playerrank.setplayer.error.already");
+            if (!PlayerData.getPlayerName(playerId)) reject("playerrank.error.notfound.player");
+            if (!ranks.hasOwnProperty(rankId)) reject("playerrank.error.notfound.rank");
+            if (PlayerRank.getRankId(playerId) === rankId) reject("playerrank.error.already");
 
             let data: PlayerRankChangeEvent = {
                 playerId,

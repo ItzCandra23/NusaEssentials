@@ -1,6 +1,7 @@
 import { Player } from "@minecraft/server";
-import { CustomForm, FormButton, FormInput, SimpleForm } from "./form-ui";
+import { CustomForm, FormItems, SimpleForm } from "./form-ui";
 import Database from "./database";
+import Translate from "./translate";
 
 namespace ChatFilter {
     
@@ -78,8 +79,8 @@ namespace ChatFilter {
     export function adminUI(player: Player) {
         const filters = ChatFilter.getRawFilters();
         const form = new SimpleForm("chatfilter.form-ui.admin.title", "chatfilter.form-ui.admin.description", [
-            ...filters.map((v) => new FormButton(Translate.translate("chatfilter.form-ui.admin.buttons.filter", ["{filter}", v]))),
-            new FormButton("chatfilter.form-ui.admin.buttons.addfilter"),
+            ...filters.map((v) => FormItems.FormButton(Translate.translate("chatfilter.form-ui.admin.buttons.filter", ["{filter}", v]))),
+            FormItems.FormButton("chatfilter.form-ui.admin.buttons.addfilter"),
         ]);
 
         form.sendTo(player, "chatfilter").then((res) => {
@@ -88,7 +89,7 @@ namespace ChatFilter {
                 const form2 = new CustomForm();
 
                 form2.setTitle("chatfilter.form-ui.addfilter.title");
-                form2.addComponent(new FormInput("chatfilter.form-ui.addfilter.contents.filter", "chatfilter.form-ui.addfilter.contents.filter.placeholder"));
+                form2.addComponent(FormItems.FormInput("chatfilter.form-ui.addfilter.contents.filter", "chatfilter.form-ui.addfilter.contents.filter.placeholder"));
 
                 form2.sendTo(player, "chatfilter").then((res2) => {
                     if (res2.formValues === undefined) return;

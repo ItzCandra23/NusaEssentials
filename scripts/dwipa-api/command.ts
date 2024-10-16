@@ -138,6 +138,16 @@ export const command = {
             const player = data.player;
             let params: Record<string, Player|string|number|boolean|Vector3|undefined> = {};
 
+            if (Object.keys(_parameters).length < Object.keys(data.params).length) {
+                const err = Object.entries(data.params)[Object.keys(parameters).length];
+                Translate.sendTranslate(player, "command.error.params", ["{error}", `${command.prefix() + _command.name + " " + Object.entries(params).map(([key, v]) => {
+                    if (typeof v === "object" && v instanceof Player) return v.name;
+                    else if (typeof v === "string" && _parameters[key][0] === "playerid") return PlayerData.getPlayerName(v);
+                    else return v;
+                }).join(" ")} >>${err[1]}<<`]);
+                return;
+            }
+
             for (const [param, type] of Object.entries(_parameters)) {
                 let value = data.params[Object.keys(params).length];
 
@@ -225,16 +235,6 @@ export const command = {
                     }).join(" ")} >><<`]);
                     return;
                 }
-            }
-
-            if (Object.keys(_parameters).length < Object.keys(data.params).length) {
-                const err = Object.entries(data.params)[Object.keys(parameters).length];
-                player.sendMessage(Translate.translate("command.error.params", ["{error}", `${command.prefix() + _command.name + " " + Object.entries(params).map(([key, v]) => {
-                    if (typeof v === "object" && v instanceof Player) return v.name;
-                    else if (typeof v === "string" && _parameters[key][0] === "playerid") return PlayerData.getPlayerName(v);
-                    else return v;
-                }).join(" ")} >>${err[1]}<<`]));
-                return;
             }
 
             callback(params as any, player);
@@ -342,7 +342,7 @@ world.beforeEvents.chatSend.subscribe((ev) => {
         };
 
         try { await cmdEvent.emit("PlayerChat", data); } catch(err) {}
-        if (rank_chat) data.chat = PlayerRank.getFormatChat(player.name, data.message, data.chat) ?? data.chat;
+        if (rank_chat) data.chat = PlayerRank.getFormatChat(player.id, data.message, data.chat) ?? data.chat;
 
         if (data.cancel) return;
         if (data.message === "" || data.message === " ".repeat(data.message.length) || (data.message.match(/§/g) || []).length * 2 === data.message.length) return;
@@ -352,6 +352,14 @@ world.beforeEvents.chatSend.subscribe((ev) => {
             console.log(textFilter(data.chat));
         } catch(err) {}
     });
+});
+
+system.afterEvents.scriptEventReceive.subscribe((data) => {
+    if (!data.id.startsWith("nusa:run")) return;
+    const name = data.id.split("_")[1];
+    const target = name ? (world.getPlayers({ name })[0] || undefined) : data.initiator;
+
+    if (target instanceof Player) CustomCommandFactory.emitCommand(target, data.message);
 });
 
 function textFilter(text: string): string {

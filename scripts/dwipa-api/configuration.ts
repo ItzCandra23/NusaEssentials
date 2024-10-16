@@ -11,7 +11,7 @@ namespace NusaConfiguration {
     export function setConfig<T = any>(path: string, value: T): Promise<void> {
         return new Promise((resolve) => {
             system.run(async () => {
-                let nusaConfig = Database.get("nusa-config");
+                let nusaConfig = Database.get("nusa-config") || {};
                 setArray(nusaConfig, path, value);
                 Database.set("nusa-config", nusaConfig);
                 resolve();
@@ -20,13 +20,13 @@ namespace NusaConfiguration {
     }
     
     export function getConfig<T = any>(path: string = ""): T|null {
-        const nusaConfig = Database.get("nusa-config");
+        const nusaConfig = Database.get("nusa-config") || {};
         
         if (typeof nusaConfig === "undefined") return null;
         return getArray(nusaConfig, path);
     }
 
-    function setArray(obj: any, path: string, value: any): void {
+    function setArray(obj: any, path: string, value: any): any {
         const keys = path.split('.');
         let current = obj;
 
@@ -43,6 +43,8 @@ namespace NusaConfiguration {
             const lastKey = keys[keys.length - 1];
             current[lastKey] = value;
         }
+
+        return current;
     }
 
     function getArray(obj: any, path: string): any {

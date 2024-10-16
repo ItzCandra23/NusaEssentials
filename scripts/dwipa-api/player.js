@@ -1,5 +1,8 @@
 import { world } from "@minecraft/server";
 import Database from "./database";
+import ScoreData from "./score";
+import PlayerRank from "./playerrank";
+import Translate from "./translate";
 class PlayerData {
     static register(player) {
         var _a;
@@ -19,8 +22,8 @@ class PlayerData {
     static getByName(username) {
         var _a;
         let players = (_a = Database.get("player-data")) !== null && _a !== void 0 ? _a : {};
-        for (const id of Object.keys(players)) {
-            if (players[id].toLowerCase() === username.toLowerCase()) {
+        for (const [id, name] of Object.entries(players)) {
+            if (name.toLowerCase() === username.toLowerCase()) {
                 return new PlayerData(id);
             }
         }
@@ -29,8 +32,8 @@ class PlayerData {
     static getPlayerId(username) {
         var _a;
         let players = (_a = Database.get("player-data")) !== null && _a !== void 0 ? _a : {};
-        for (const id of Object.keys(players)) {
-            if (players[id].toLowerCase() === username.toLowerCase()) {
+        for (const [id, name] of Object.entries(players)) {
+            if (name.toLowerCase() === username.toLowerCase()) {
                 return id;
             }
         }
@@ -45,6 +48,34 @@ class PlayerData {
     }
     static getPlayer(id) {
         return world.getAllPlayers().find((v) => v.id === id);
+    }
+    static getScore(id, objective) {
+        return ScoreData.getPlayerScore(id, objective);
+    }
+    static addScore(id, objective, score, fixObj) {
+        return ScoreData.getPlayer(id).addScore(objective, score, fixObj);
+    }
+    static removeScore(id, objective, score, minScore, fixObj) {
+        return ScoreData.getPlayer(id).removeScore(objective, score, minScore, fixObj);
+    }
+    static setScore(id, objective, score, fixObj) {
+        return ScoreData.getPlayer(id).setScore(objective, score, fixObj);
+    }
+    static getScoreId(id) {
+        return ScoreData.getScoreId(id);
+    }
+    static getScoreIdentity(id) {
+        var _a;
+        return (_a = ScoreData.getScoreIdentity(this.getScoreId(id))) !== null && _a !== void 0 ? _a : null;
+    }
+    static getRankId(id) {
+        return PlayerRank.getRankId(id);
+    }
+    static setRankId(id, rankId) {
+        return PlayerRank.setPlayer(id, rankId);
+    }
+    static sendTranslateMessage(player, text, replace) {
+        return player.sendMessage(Translate.translate(text, replace));
     }
     constructor(id) {
         this.id = id;
@@ -61,6 +92,36 @@ class PlayerData {
     }
     isOnline() {
         return Boolean(PlayerData.getPlayer(this.id));
+    }
+    getScore(objective) {
+        return PlayerData.getScore(this.id, objective);
+    }
+    addScore(objective, score, fixObj) {
+        return PlayerData.addScore(this.id, objective, score, fixObj);
+    }
+    removeScore(objective, score, minScore, fixObj) {
+        return PlayerData.removeScore(this.id, objective, score, minScore, fixObj);
+    }
+    setScore(objective, score, fixObj) {
+        return PlayerData.setScore(this.id, objective, score, fixObj);
+    }
+    getScoreId() {
+        return PlayerData.getScoreId(this.id);
+    }
+    getScoreIdentity() {
+        return PlayerData.getScoreIdentity(this.id);
+    }
+    getRankId() {
+        return PlayerData.getRankId(this.id);
+    }
+    setRankId(rankId) {
+        return PlayerData.setRankId(this.id, rankId);
+    }
+    sendTranslateMessage(text, replace) {
+        const player = this.getPlayer();
+        if (!player)
+            return;
+        return PlayerData.sendTranslateMessage(player, text, replace);
     }
 }
 world.afterEvents.playerSpawn.subscribe((ev) => {

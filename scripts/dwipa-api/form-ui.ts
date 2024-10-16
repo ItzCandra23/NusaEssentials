@@ -57,9 +57,74 @@ export type FormItem = FormItemLabel | FormItemToggle | FormItemSlider | FormIte
 const PlayerBusyList = new Map<string, number>();
 const TextureItems = new Map<string, [string, boolean]>();
 
-export namespace FormItem {
+export namespace FormItems {
     
-    export function FormButton()
+    export function FormButton(text: string|RawMessage, image?: string): FormItemButton {
+        if (typeof text === "string") text=Translate.translate(text);
+        return {
+            text,
+            image,
+        };
+    }
+
+    export function FormLabel(text: string|RawMessage): FormItemLabel {
+        if (typeof text === "string") text=Translate.translate(text);
+        return {
+            type: "label",
+            text,
+        };
+    }
+
+    export function FormToggle(text: string|RawMessage, defaultValue?: boolean): FormItemToggle {
+        if (typeof text === "string") text=Translate.translate(text);
+        return {
+            type: "toggle",
+            text,
+            default: defaultValue,
+        };
+    }
+
+    export function FormSlider(text: string|RawMessage, min: number, max: number, step: number, defaultValue?: number): FormItemSlider {
+        if (typeof text === "string") text=Translate.translate(text);
+        return {
+            type: "slider",
+            text,
+            min,
+            max,
+            step,
+            default: defaultValue,
+        };
+    }
+
+    export function FormStepSlider(text: string|RawMessage, steps: (string|RawMessage)[], defaultIndex?: number): FormItemStepSlider {
+        if (typeof text === "string") text=Translate.translate(text);
+        return {
+            type: "step_slider",
+            text,
+            steps,
+            default: defaultIndex,
+        };
+    }
+
+    export function FormDropdown(text: string|RawMessage, options: (string|RawMessage)[], defaultIndex?: number): FormItemDropdown {
+        if (typeof text === "string") text=Translate.translate(text);
+        return {
+            type: "dropdown",
+            text,
+            options,
+            default: defaultIndex,
+        };
+    }
+
+    export function FormInput(text: string|RawMessage, placeholder: string|RawMessage, defaultValue?: string): FormItemInput {
+        if (typeof text === "string") text=Translate.translate(text);
+        return {
+            type: "input",
+            text,
+            placeholder,
+            default: defaultValue,
+        };
+    }
 }
 
 export class ChestForm {
