@@ -3,6 +3,26 @@ import Translate from "../translate";
 Translate.createLanguage("en-US", {
     "chat.muted": "§cYou are muted!",
     "command.error.params": "§cError! Commmand: {error}§r§c Invalid command parameters",
+
+    "commands.helpall.description": "Provides help/list of commands",
+    "commands.about.description": "Send addon information",
+
+    "commands.pluginadm.description": "Plugins Manager for Admin",
+    "commands.plugin.description": "List/Check available plugins",
+    "commands.plugin.error": "§cPlugin not found!",
+
+    "commands.category.description": "List/Check Category Commands",
+    "commands.category.error": "§cCategory not found!",
+
+    "commands.help.description": "Provides help/list of commands",
+    "commands.help.error": "§cCommand not found!",
+    "commands.help.result": "§8---- §2Nusa§dCommands §7page {page} of {max_page} §8----§r\n{commands}§r\n§2Use {prefix}help <page> for switch page or use {prefix}help <command> for command details",
+    "commands.help.result.category": "§8+---§e {category} §r§8---+",
+    "commands.help.result.commandline": "§r§e- §a{prefix}{command} {parameters} §b- {description}",
+    "commands.help.result.command": "§8---- §2Nusa§dCommand §7{command} §8----§r\n§e-§r Command: §a{prefix}{command} {parameters}§r\n§e-§r Description: §b{description}§r\n§e-§r Permission: §e{permission}§r\n§e-§r Category: §9{category}§r\n§2Use {prefix}help <page> for switch page or use {prefix}help <command> for command details",
+
+    "commands.config.description": "Customize addon configuration",
+    "commands.setlanguage.description": "Change addon language",
     
     "translate.success.set": "[Language] §aSuccess to set language",
     "translate.error.notfound": "[Language] §cLanguage not found!",
@@ -37,6 +57,24 @@ Translate.createLanguage("en-US", {
     "playerrank.error.notfound.player": "[PlayerRank] §cPlayer Id not found!",
     "playerrank.error.notfound.rank": "[PlayerRank] §cRank Id not found!",
     "playerrank.error.already": "[PlayerRank] §cAlready!",
+
+    "form-ui.buttons.back": "§8[ §cBACK §8]",
+    "form-ui.buttons.cancel": "§8[ §cCANCEL §8]",
+    "form-ui.buttons.close": "§8[ §cCLOSE §8]",
+    "form-ui.message.busy": "§aFormUI §r§8» §fPress Jump to run/open ui menu before 1 minuits timeout left",
+    "form-ui.error.value": "§cInvalid value!",
+
+    "config.success.set": "[Config] §aSuccess to set!",
+    "config.success.reset": "[Config] §aSuccess to reset!",
+    "config.error.value": "[Config] §cInvalid value!",
+
+    "config.form-ui.setconfig.title": "§2Config§dUI",
+    "config.form-ui.setconfig.description": "§a- Data:§r {data}§r\n§a- Path:§e {path}§r\n\nType ({type})",
+    
+    "config.form-ui.reset.title": "§2Config§dUI",
+    "config.form-ui.reset.description": "Are you sure want to reset §a{path}§r?",
+    "config.form-ui.reset.buttons.confirm": "§cYes",
+    "config.form-ui.reset.buttons.cancel": "§aNo",
 
     "chatfilter.error.invalid": "[ChatFilter] §cInvalid filter!",
     "chatfilter.error.already": "[ChatFilter] §cFilter already!",

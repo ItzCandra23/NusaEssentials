@@ -1,3 +1,4 @@
+var _a;
 import { Player, system, world } from "@minecraft/server";
 import EventEmitter from "./utils/eventEmitter";
 import NusaConfiguration from "./configuration";
@@ -10,6 +11,7 @@ export var CommandPermissionLevel;
     CommandPermissionLevel[CommandPermissionLevel["ADMIN"] = 1] = "ADMIN";
 })(CommandPermissionLevel || (CommandPermissionLevel = {}));
 NusaConfiguration.register("command_prefix", "!");
+let cmdPrefix = (_a = NusaConfiguration.getConfig("command_prefix")) !== null && _a !== void 0 ? _a : "!";
 const cmdEvent = new EventEmitter();
 const commands = new Map();
 export const command = {
@@ -18,18 +20,21 @@ export const command = {
             if (prefix === "" || prefix.includes(" "))
                 reject("command.setprefix.error.invalid");
             await NusaConfiguration.setConfig("command_prefix", prefix);
+            cmdPrefix = prefix;
             resolve();
         });
     },
     prefix() {
-        const raw = NusaConfiguration.getConfig("command_prefix");
-        if (typeof raw === "undefined" || raw === "")
-            return "!";
-        return raw;
+        return cmdPrefix;
     },
-    find(command) {
+    find(cmd) {
         var _a;
-        return (_a = commands.get(command)) !== null && _a !== void 0 ? _a : null;
+        let data = (_a = commands.get(cmd)) !== null && _a !== void 0 ? _a : null;
+        if (!data)
+            for (const cmdData of commands.values())
+                if (cmdData.aliases.includes(cmd))
+                    data = cmdData;
+        return data;
     },
     register(name, description, category, permission = CommandPermissionLevel.NORMAL, callback, parameters, aliases = [], disable = false) {
         if (disable)
@@ -193,6 +198,39 @@ export var CustomCommandFactory;
         cmdEvent.on("PlayerChat", callback);
     }
     CustomCommandFactory.onPlayerChat = onPlayerChat;
+    function getPlayerHelpCommands(page = 0, permissions = CommandPermissionLevel.NORMAL, max_category = 3) {
+        const groupCategory = groupByCategory(commands.values()).map(([category, data]) => [category, (permissions === CommandPermissionLevel.ADMIN || Array.isArray(permissions) && permissions.some((perm) => perm.toUpperCase() === "ADMIN")) ? data : data.filter((v) => typeof v.permission === "number" ? (v.permission === CommandPermissionLevel.NORMAL ? true : false) : Array.isArray(permissions) ? permissions.some((perm) => perm.toLowerCase() === v.permission.toLowerCase()) : false)]).filter((v) => v[1].length);
+        let result = [];
+        let categorySize = 0;
+        let currentPage = 0;
+        for (const [category, data] of groupCategory) {
+            const cmds = data;
+            if (cmds.length === 0)
+                continue;
+            if (categorySize === max_category) {
+                result = [];
+                categorySize = 0;
+            }
+            categorySize++;
+            result.push(Translate.translate("commands.help.result.category", ["{category}", category]));
+            for (const cmd of cmds) {
+                const params = Object.entries(cmd.parameters).map(([key, type]) => {
+                    const _type = (Array.isArray(type) ? type : [type, false]);
+                    return `<${key}${_type[1] ? "?" : ""}: ${_type[0]}>`;
+                });
+                result.push(...[
+                    Translate.translate("commands.help.result.commandline", [["{prefix}", command.prefix()], ["{command}", cmd.name], ["{parameters}", params.join(" ")], ["{description}", Translate.translate(cmd.description)]]),
+                    ...cmd.aliases.map((alias) => Translate.translate("commands.help.result.commandline", [["{prefix}", command.prefix()], ["{command}", alias], ["{parameters}", params.join(" ")], ["{description}", Translate.translate(cmd.description)]])),
+                ]);
+            }
+            if (categorySize === max_category)
+                currentPage++;
+            if (page > 0 && currentPage === page)
+                break;
+        }
+        return [result, currentPage <= 0 ? 1 : currentPage, groupCategory.length];
+    }
+    CustomCommandFactory.getPlayerHelpCommands = getPlayerHelpCommands;
     function getPlayerCommandPermission(player) {
         if (PlayerRank.isAdmin(player))
             return CommandPermissionLevel.ADMIN;
@@ -230,7 +268,7 @@ export var CustomCommandFactory;
             player,
             params: result.slice(1),
         };
-        cmdEvent.emit(`command:${cmd}`, emitData);
+        cmdEvent.emit(`command:${data.name}`, emitData);
     }
     CustomCommandFactory.emitCommand = emitCommand;
     function createCommand(data) {
@@ -319,4 +357,15 @@ function textFilter(text) {
         return v;
     else
         return v.slice(1); }).join().replace(/,/g, "");
+}
+function groupByCategory(commands) {
+    const grouped = Array.from(commands).reduce((acc, command) => {
+        const index = acc.findIndex(([category]) => category === command.category);
+        if (index !== -1)
+            acc[index][1].push(command);
+        else
+            acc.push([command.category, [command]]);
+        return acc;
+    }, []);
+    return grouped;
 }

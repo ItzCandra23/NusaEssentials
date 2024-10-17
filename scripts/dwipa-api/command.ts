@@ -24,10 +24,11 @@ export interface CustomCommandData {
     aliases: string[];
 }
 
-type CommandParameters = "player"|"playerid"|"string"|"number"|"boolean"|string[]|Record<string, string|number|boolean|Vector3>;
+export type CommandParameters = "player"|"playerid"|"string"|"number"|"boolean"|string[]|Record<string, string|number|boolean|Vector3>;
 
 NusaConfiguration.register("command_prefix", "!");
 
+let cmdPrefix = NusaConfiguration.getConfig("command_prefix") ?? "!";
 const cmdEvent = new EventEmitter();
 const commands = new Map<string, CustomCommandData>();
 
@@ -38,18 +39,19 @@ export const command = {
             if (prefix === "" || prefix.includes(" ")) reject("command.setprefix.error.invalid");
 
             await NusaConfiguration.setConfig("command_prefix", prefix);
+            cmdPrefix = prefix;
             resolve();
         });
     },
 
     prefix(): string {
-        const raw = NusaConfiguration.getConfig("command_prefix");
-        if (typeof raw === "undefined" || raw === "") return "!";
-        return raw;
+        return cmdPrefix;
     },
 
-    find(command: string): CustomCommandData|null {
-        return commands.get(command) ?? null;
+    find(cmd: string): CustomCommandData|null {
+        let data = commands.get(cmd) ?? null;
+        if (!data) for (const cmdData of commands.values()) if (cmdData.aliases.includes(cmd)) data = cmdData;
+        return data;
     },
 
     register<PARAMS extends Record<string, CommandParameters|[CommandParameters, boolean]>>(name: string, description: string, category: string, permission: CommandPermissionLevel|string = CommandPermissionLevel.NORMAL, callback: (params: {
@@ -254,6 +256,42 @@ export namespace CustomCommandFactory {
         cmdEvent.on("PlayerChat", callback);
     }
 
+    export function getPlayerHelpCommands(page: number = 0, permissions: string[]|CommandPermissionLevel = CommandPermissionLevel.NORMAL, max_category: number = 3): [string[], number, number] {
+        const groupCategory = (groupByCategory(commands.values()).map(([category, data]) => [category, (permissions === CommandPermissionLevel.ADMIN || Array.isArray(permissions) && permissions.some((perm) => perm.toUpperCase() === "ADMIN")) ? data : data.filter((v) => typeof v.permission === "number" ? (v.permission === CommandPermissionLevel.NORMAL ? true : false) : Array.isArray(permissions) ? permissions.some((perm) => perm.toLowerCase() === (v.permission as string).toLowerCase()) : false)]) as [string, CustomCommandData[]][]).filter((v) => v[1].length);
+        let result: string[] = [];
+        let categorySize = 0;
+        let currentPage = 0;
+
+        for (const [category, data] of groupCategory) {
+            const cmds = data;
+
+            if (cmds.length === 0) continue;
+            if (categorySize === max_category) {
+                result = [];
+                categorySize = 0;
+            }
+            categorySize++;
+
+            result.push(Translate.translate("commands.help.result.category", ["{category}", category]));
+            for (const cmd of cmds) {
+                const params = Object.entries(cmd.parameters).map(([key, type]) => {
+                    const _type = (Array.isArray(type) ? type : [type, false]) as [CommandParameters, boolean];
+                    return `<${key}${_type[1] ? "?" : ""}: ${_type[0]}>`;
+                });
+
+                result.push(...[
+                    Translate.translate("commands.help.result.commandline", [["{prefix}", command.prefix()], ["{command}", cmd.name], ["{parameters}", params.join(" ")], ["{description}", Translate.translate(cmd.description)]]),
+                    ...cmd.aliases.map((alias) => Translate.translate("commands.help.result.commandline", [["{prefix}", command.prefix()], ["{command}", alias], ["{parameters}", params.join(" ")], ["{description}", Translate.translate(cmd.description)]])),
+                ]);
+            }
+            
+            if (categorySize === max_category) currentPage++;
+            if (page > 0 && currentPage === page) break;
+        }
+
+        return [result, currentPage <= 0 ? 1 : currentPage, groupCategory.length];
+    }
+
     export function getPlayerCommandPermission(player: Player): CommandPermissionLevel {
         if (PlayerRank.isAdmin(player)) return CommandPermissionLevel.ADMIN;
         else return CommandPermissionLevel.NORMAL;
@@ -285,7 +323,7 @@ export namespace CustomCommandFactory {
             params: result.slice(1),
         };
 
-        cmdEvent.emit(`command:${cmd}`, emitData);
+        cmdEvent.emit(`command:${data.name}`, emitData);
     }
 
     export function createCommand(data: CustomCommandData): CustomCommandData {
@@ -364,4 +402,15 @@ system.afterEvents.scriptEventReceive.subscribe((data) => {
 
 function textFilter(text: string): string {
     return text.split("§").map((v, i) => { if (i === 0) return v; else return v.slice(1)}).join().replace(/,/g, "");
+}
+
+function groupByCategory(commands: IterableIterator<CustomCommandData>): [string, CustomCommandData[]][] {
+    const grouped = Array.from(commands).reduce((acc, command) => {
+        const index = acc.findIndex(([category]) => category === command.category);
+        if (index !== -1) acc[index][1].push(command);
+        else acc.push([command.category, [command]]);
+        return acc;
+    }, [] as [string, CustomCommandData[]][]);
+
+    return grouped;
 }
