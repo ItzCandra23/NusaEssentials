@@ -64,7 +64,6 @@ class RankPerms {
      * @param display Name Display
      * @param permissions Rank Permissions Access
      * @throws "rankperms.error.invalid.rank" Invalid Rank Id characters or Rank Id exceeds 20 characters
-     * @throws "rankperms.error.invalid.display" Invalid Rank Display not found
      * @throws "rankperms.error.already.rank" Rank Id Already
      * @returns (RankPerms) -- Success to create
      */
@@ -76,7 +75,7 @@ class RankPerms {
             
             if (!idRegex.test(rankId) || rankId.length > 24) reject("rankperms.error.invalid.rank");
             if (Object.keys(ranks).some(key => key.toLowerCase() === rankId.toLowerCase())) reject("rankperms.error.already.rank");
-            if (display === "" || display === " ".repeat(display.length)) reject("rankperms.error.invalid.display");
+            if (display === "" || display === " ".repeat(display.length)) display = rankId;
 
             let data: RankData = {
                 display,

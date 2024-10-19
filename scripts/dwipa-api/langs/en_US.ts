@@ -50,17 +50,39 @@ Translate.createLanguage("en-US", {
     "rankperms.success.addpermission": "[RankPerms] §aSuccess to add permission!",
     "rankperms.success.removepermission": "[RankPerms] §aSuccess to remove permission!",
     "rankperms.success.setpermission": "[RankPerms] §aSuccess to set permission!",
-    
+
     "rankperms.success.setdisplay": "[RankPerms] §aSuccess to set display!",
     "rankperms.success.setformat": "[RankPerms] §aSuccess to set format!",
+
+    "rankperms.form-ui.createrank.title": "§eCreate§aRank",
+    "rankperms.form-ui.createrank.contents.rankid": "Rank Id:",
+    "rankperms.form-ui.createrank.contents.rankid.placeholder": "Rank Name",
+    "rankperms.form-ui.createrank.contents.display": "Display:",
+    "rankperms.form-ui.createrank.contents.display.placeholder": "Rank Display",
+
+    "rankperms.form-ui.deleterank.title": "§eDelete§aRank: §r{rank}",
+    "rankperms.form-ui.deleterank.description": "Are you sure want to delete this rank?\n\nRank Id: {rank}§r\nDisplay: {display}§r\nPermissions:\n{permissions}§r\n",
+    "rankperms.form-ui.deleterank.description.permission": "    §7- §e{permission}§r\n",
+
+    "rankperms.form-ui.editrank.title": "§eEdit§aRank: §r{rank}",
+    "rankperms.form-ui.editrank.description": "\nRank Id: {rank}§r\nDisplay: {display}§r\nPermissions:\n{permissions}§r\n",
+    "rankperms.form-ui.editrank.description.permission": "    §7- §e{permission}§r\n",
+    "rankperms.form-ui.editrank.buttons.moveup": "§2Move Up",
+    "rankperms.form-ui.editrank.buttons.movedown": "§2Move Down",
+    "rankperms.form-ui.editrank.buttons.setdisplay": "§2Set Display",
+    "rankperms.form-ui.editrank.buttons.permissions": "§2Permissions",
+    "rankperms.form-ui.editrank.buttons.setformatchat": "§2Set Format Chat",
+    "rankperms.form-ui.editrank.buttons.setformatname": "§2Set Format Name",
+    "rankperms.form-ui.editrank.buttons.deleterank": "§4Delete Rank",
 
     "playerrank.error.notfound.player": "[PlayerRank] §cPlayer Id not found!",
     "playerrank.error.notfound.rank": "[PlayerRank] §cRank Id not found!",
     "playerrank.error.already": "[PlayerRank] §cAlready!",
 
-    "form-ui.buttons.back": "§8[ §cBACK §8]",
+    "form-ui.buttons.confirm": "§8[ §aCONFIRM §8]",
     "form-ui.buttons.cancel": "§8[ §cCANCEL §8]",
     "form-ui.buttons.close": "§8[ §cCLOSE §8]",
+    "form-ui.buttons.back": "§8[ §cBACK §8]",
     "form-ui.message.busy": "§aFormUI §r§8» §fPress Jump to run/open ui menu before 1 minuits timeout left",
     "form-ui.error.value": "§cInvalid value!",
 
