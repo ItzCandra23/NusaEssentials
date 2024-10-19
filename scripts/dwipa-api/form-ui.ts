@@ -118,6 +118,7 @@ export namespace FormItems {
 
     export function FormInput(text: string|RawMessage, placeholder: string|RawMessage, defaultValue?: string): FormItemInput {
         if (typeof text === "string") text=Translate.translate(text);
+        if (typeof placeholder === "string") placeholder=Translate.translate(placeholder);
         return {
             type: "input",
             text,
@@ -179,7 +180,7 @@ export class ChestForm {
                 try {
                     if (permission === CommandPermissionLevel.ADMIN) permission="admin";
                     if (permission === CommandPermissionLevel.NORMAL) permission=undefined;
-                    if (permission && !PlayerRank.hasPermission(player.id, permission)) {
+                    if (permission && !PlayerRank.hasPermission(player, permission)) {
                         resolve({
                             canceled: true,
                             cancelationReason: FormCancelationReason.UserClosed,
@@ -291,7 +292,7 @@ export class SimpleForm {
                 try {
                     if (permission === CommandPermissionLevel.ADMIN) permission="admin";
                     if (permission === CommandPermissionLevel.NORMAL) permission=undefined;
-                    if (permission && !PlayerRank.hasPermission(player.id, permission)) {
+                    if (permission && !PlayerRank.hasPermission(player, permission)) {
                         resolve({
                             canceled: true,
                             cancelationReason: FormCancelationReason.UserClosed,
@@ -410,7 +411,7 @@ export class ModalForm {
                 try {
                     if (permission === CommandPermissionLevel.ADMIN) permission="admin";
                     if (permission === CommandPermissionLevel.NORMAL) permission=undefined;
-                    if (permission && !PlayerRank.hasPermission(player.id, permission)) {
+                    if (permission && !PlayerRank.hasPermission(player, permission)) {
                         resolve({
                             canceled: true,
                             cancelationReason: FormCancelationReason.UserClosed,
@@ -517,7 +518,7 @@ export class CustomForm {
                 try {
                     if (permission === CommandPermissionLevel.ADMIN) permission="admin";
                     if (permission === CommandPermissionLevel.NORMAL) permission=undefined;
-                    if (permission && !PlayerRank.hasPermission(player.id, permission)) {
+                    if (permission && !PlayerRank.hasPermission(player, permission)) {
                         resolve({
                             canceled: true,
                             cancelationReason: FormCancelationReason.UserClosed,

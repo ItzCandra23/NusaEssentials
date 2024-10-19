@@ -51,11 +51,11 @@ class PlayerRank {
             let ranks = Object.keys(RankPerms.getRawRanks());
             let dataplayers = PlayerRank.getPlayers();
             if (!PlayerData.getPlayerName(playerId))
-                reject("playerrank.error.notfound.player");
+                return reject("playerrank.error.notfound.player");
             if (!ranks.hasOwnProperty(rankId))
-                reject("playerrank.error.notfound.rank");
+                return reject("playerrank.error.notfound.rank");
             if (PlayerRank.getRankId(playerId) === rankId)
-                reject("playerrank.error.already");
+                return reject("playerrank.error.already");
             let data = {
                 playerId,
                 beforeRankId: PlayerRank.getRankId(playerId),

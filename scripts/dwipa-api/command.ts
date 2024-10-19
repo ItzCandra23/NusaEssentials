@@ -36,7 +36,7 @@ export const command = {
 
     setPrefix(prefix: string): Promise<void> {
         return new Promise(async (resolve, reject) => {
-            if (prefix === "" || prefix.includes(" ")) reject("command.setprefix.error.invalid");
+            if (prefix === "" || prefix.includes(" ")) return reject("command.setprefix.error.invalid");
 
             await NusaConfiguration.setConfig("command_prefix", prefix);
             cmdPrefix = prefix;
@@ -257,7 +257,7 @@ export namespace CustomCommandFactory {
     }
 
     export function getPlayerHelpCommands(page: number = 0, permissions: string[]|CommandPermissionLevel = CommandPermissionLevel.NORMAL, max_category: number = 3): [string[], number, number] {
-        const groupCategory = (groupByCategory(commands.values()).map(([category, data]) => [category, (permissions === CommandPermissionLevel.ADMIN || Array.isArray(permissions) && permissions.some((perm) => perm.toUpperCase() === "ADMIN")) ? data : data.filter((v) => typeof v.permission === "number" ? (v.permission === CommandPermissionLevel.NORMAL ? true : false) : Array.isArray(permissions) ? permissions.some((perm) => perm.toLowerCase() === (v.permission as string).toLowerCase()) : false)]) as [string, CustomCommandData[]][]).filter((v) => v[1].length);
+        const groupCategory = (groupByCategory(commands.values()).map(([category, data]) => [category, (Array.isArray(permissions) ? permissions.some((v) => v.toUpperCase() === "ADMIN") : permissions === CommandPermissionLevel.ADMIN) ? data : data.filter((v) => v.permission === CommandPermissionLevel.NORMAL ? true : v.permission === CommandPermissionLevel.ADMIN ? false : Array.isArray(permissions) ? permissions.some((_v) => _v.toLowerCase() === (v.permission as string).toLowerCase()) : false)]) as [string, CustomCommandData[]][]).filter((v) => v[1].length);
         let result: string[] = [];
         let categorySize = 0;
         let currentPage = 0;

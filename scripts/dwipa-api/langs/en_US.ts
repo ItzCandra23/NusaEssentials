@@ -23,6 +23,8 @@ Translate.createLanguage("en-US", {
 
     "commands.config.description": "Customize addon configuration",
     "commands.setlanguage.description": "Change addon language",
+
+    "commands.rankadm.description": "Rank Permission admin commands",
     
     "translate.success.set": "[Language] §aSuccess to set language",
     "translate.error.notfound": "[Language] §cLanguage not found!",
@@ -45,14 +47,21 @@ Translate.createLanguage("en-US", {
 
     "rankperms.success.createrank": "[RankPerms] §aSuccess to create rank!",
     "rankperms.success.deleterank": "[RankPerms] §aSuccess to delete rank!",
+    "rankperms.success.renamerank": "[RankPerms] §aSuccess to rename rank!",
     "rankperms.success.moverank": "[RankPerms] §aSuccess to move rank!",
 
+    "rankperms.success.addinheritance": "[RankPerms] §aSuccess to add inheritance!",
     "rankperms.success.addpermission": "[RankPerms] §aSuccess to add permission!",
     "rankperms.success.removepermission": "[RankPerms] §aSuccess to remove permission!",
     "rankperms.success.setpermission": "[RankPerms] §aSuccess to set permission!",
 
     "rankperms.success.setdisplay": "[RankPerms] §aSuccess to set display!",
     "rankperms.success.setformat": "[RankPerms] §aSuccess to set format!",
+
+    "rankperms.form-ui.main.title": "§bRank§aPerms",
+    "rankperms.form-ui.main.description": "",
+    "rankperms.form-ui.main.buttons.rank": "{display}§r\n§a{rank}",
+    "rankperms.form-ui.main.buttons.createrank": "§2Create Rank",
 
     "rankperms.form-ui.createrank.title": "§eCreate§aRank",
     "rankperms.form-ui.createrank.contents.rankid": "Rank Id:",
@@ -61,19 +70,63 @@ Translate.createLanguage("en-US", {
     "rankperms.form-ui.createrank.contents.display.placeholder": "Rank Display",
 
     "rankperms.form-ui.deleterank.title": "§eDelete§aRank: §r{rank}",
-    "rankperms.form-ui.deleterank.description": "Are you sure want to delete this rank?\n\nRank Id: {rank}§r\nDisplay: {display}§r\nPermissions:\n{permissions}§r\n",
+    "rankperms.form-ui.deleterank.description": "Are you sure want to delete this rank?\n\nRank Id: §a{rank}§r\nDefault: §b{default}§r\nDisplay: {display}§r\nPermissions:\n{permissions}§r\n",
     "rankperms.form-ui.deleterank.description.permission": "    §7- §e{permission}§r\n",
 
     "rankperms.form-ui.editrank.title": "§eEdit§aRank: §r{rank}",
-    "rankperms.form-ui.editrank.description": "\nRank Id: {rank}§r\nDisplay: {display}§r\nPermissions:\n{permissions}§r\n",
+    "rankperms.form-ui.editrank.description": "\nRank Id: §a{rank}§r\nDefault: §b{default}§r\nDisplay: {display}§r\nPermissions:\n{permissions}§r\n",
     "rankperms.form-ui.editrank.description.permission": "    §7- §e{permission}§r\n",
+    "rankperms.form-ui.editrank.buttons.rename": "§2Rename",
+    "rankperms.form-ui.editrank.buttons.setdefault": "§2Set as Default Rank",
     "rankperms.form-ui.editrank.buttons.moveup": "§2Move Up",
     "rankperms.form-ui.editrank.buttons.movedown": "§2Move Down",
     "rankperms.form-ui.editrank.buttons.setdisplay": "§2Set Display",
     "rankperms.form-ui.editrank.buttons.permissions": "§2Permissions",
+    "rankperms.form-ui.editrank.buttons.addinheritance": "§2Add Inheritance",
     "rankperms.form-ui.editrank.buttons.setformatchat": "§2Set Format Chat",
     "rankperms.form-ui.editrank.buttons.setformatname": "§2Set Format Name",
     "rankperms.form-ui.editrank.buttons.deleterank": "§4Delete Rank",
+
+    "rankperms.form-ui.renamerank.title": "§eRename§aRank: §r{rank}",
+    "rankperms.form-ui.renamerank.contents.rankid": "Rank Id:",
+    "rankperms.form-ui.renamerank.contents.rankid.placeholder": "Rank Id",
+
+    "rankperms.form-ui.setdisplay.title": "§eSet§aDisplay: §r{rank}",
+    "rankperms.form-ui.setdisplay.contents.display": "Display:",
+    "rankperms.form-ui.setdisplay.contents.display.placeholder": "Rank Display",
+
+    "rankperms.form-ui.setformatchat.title": "§eSet§aFormatChat: §r{rank}",
+    "rankperms.form-ui.setformatchat.contents.format": "Format:",
+    "rankperms.form-ui.setformatchat.contents.format.placeholder": "Format Chat",
+
+    "rankperms.form-ui.setformatname.title": "§eSet§aFormatName: §r{rank}",
+    "rankperms.form-ui.setformatname.contents.format": "Format:",
+    "rankperms.form-ui.setformatname.contents.format.placeholder": "Format Name",
+
+    "rankperms.form-ui.addinheritance.title": "§eAdd§aInheritance: §r{rank}",
+    "rankperms.form-ui.addinheritance.description": "Click rank to add inheritance",
+    "rankperms.form-ui.addinheritance.buttons.rank": "{display}§r\n§a{rank}",
+
+    "rankperms.form-ui.editpermissions.title": "§eEdit§aPermissions: §r{rank}",
+    "rankperms.form-ui.editpermissions.description": "",
+    "rankperms.form-ui.editpermissions.buttons.permission": "§d{permission}§r\n§eEdit Permission",
+    "rankperms.form-ui.editpermissions.buttons.addpermission": "§2Add Permission",
+
+    "rankperms.form-ui.editpermission.title": "§eEdit§aPermission: §r{rank}",
+    "rankperms.form-ui.editpermission.description": "Permission: §e{permission}",
+    "rankperms.form-ui.editpermission.buttons.set": "§2Set Permission",
+    "rankperms.form-ui.editpermission.buttons.remove": "§4Remove Permission",
+
+    "rankperms.form-ui.setpermission.title": "§eSet§aPermission: §r{rank}",
+    "rankperms.form-ui.setpermission.contents.permission": "Target: §e{target}§r\n\nPermission:",
+    "rankperms.form-ui.setpermission.contents.permission.placeholder": "Rank Permission",
+    
+    "rankperms.form-ui.addpermission.title": "§eAdd§aPermission: §r{rank}",
+    "rankperms.form-ui.addpermission.contents.permission": "Permission:",
+    "rankperms.form-ui.addpermission.contents.permission.placeholder": "example.rank.permission",
+
+    "rankperms.form-ui.removepermission.title": "§eRemove§aPermission: §r{rank}",
+    "rankperms.form-ui.removepermission.description": "Are you sure want to remove this permission?n\n\nRank Id: §a{rank}§r\nPermission: §e{permission}§r\n\n",
 
     "playerrank.error.notfound.player": "[PlayerRank] §cPlayer Id not found!",
     "playerrank.error.notfound.rank": "[PlayerRank] §cRank Id not found!",

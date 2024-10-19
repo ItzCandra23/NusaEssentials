@@ -1,14 +1,15 @@
 import { command, CommandPermissionLevel, CustomCommandFactory } from "../command";
+import PlayerRank from "../playerrank";
 import Translate from "../translate";
 command.register("help", "commands.help.description", "Commands", CommandPermissionLevel.NORMAL, (p, player) => {
     if (!p.page || Number(p.page) === Number(p.page)) {
-        const [cmds, page, size] = CustomCommandFactory.getPlayerHelpCommands(Number(p.page));
+        const [cmds, page, size] = CustomCommandFactory.getPlayerHelpCommands(Number(p.page), PlayerRank.isAdmin(player) ? CommandPermissionLevel.ADMIN : PlayerRank.getPermissions(player.id));
         const text = Translate.translate("commands.help.result", [["{prefix}", command.prefix()], ["{page}", `${page}`], ["{max_page}", `${size}`], ["{commands}", cmds.join("§r\n")]]);
         player.sendMessage(text);
     }
     else {
         const cmd = command.find(p.page);
-        if (!cmd)
+        if (!cmd || !CustomCommandFactory.hasPermission(player, cmd.permission))
             return Translate.sendTranslate(player, "commands.help.error");
         const params = Object.entries(cmd.parameters).map(([key, type]) => {
             const _type = (Array.isArray(type) ? type : [type, false]);
