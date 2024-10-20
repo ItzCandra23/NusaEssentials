@@ -367,8 +367,10 @@ class RankPerms {
     static renameRank(rankId: string, newRankId: string): Promise<void> {
         return new Promise((resolve, reject) => system.run(() => {
             let ranks = RankPerms.getRawRanks();
+            const idRegex = /^[a-zA-Z0-9_-]+$/;
             
             if (!ranks.hasOwnProperty(rankId)) return reject("rankperms.error.notfound.rank");
+            if (!idRegex.test(newRankId) || newRankId.length > 24) return reject("rankperms.error.invalid.rank");
             if (RankPerms.hasRank(newRankId)) return reject("rankperms.error.invalid.rank");
 
             let newRanks: Record<string, RankData> = {};

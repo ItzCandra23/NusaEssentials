@@ -23,8 +23,13 @@ Translate.createLanguage("en-US", {
 
     "commands.config.description": "Customize addon configuration",
     "commands.setlanguage.description": "Change addon language",
+    "commands.chatfilter.description": "Filter chat message",
 
     "commands.rankadm.description": "Rank Permission admin commands",
+    "commands.rankadm.result.listrank": "§aRankPerms list ({length}): {ranks}",
+    "commands.rankadm.result.listrank.rank": "§r\n§7 - §r{display} §r§a({rank})§r",
+    "commands.rankadm.result.listpermissions": "§a{rank} permissions ({length}): {permissions}",
+    "commands.rankadm.result.listpermissions.permission": "§r\n§7 - §e{permission}",
     
     "translate.success.set": "[Language] §aSuccess to set language",
     "translate.error.notfound": "[Language] §cLanguage not found!",
@@ -49,6 +54,7 @@ Translate.createLanguage("en-US", {
     "rankperms.success.deleterank": "[RankPerms] §aSuccess to delete rank!",
     "rankperms.success.renamerank": "[RankPerms] §aSuccess to rename rank!",
     "rankperms.success.moverank": "[RankPerms] §aSuccess to move rank!",
+    "rankperms.success.setdefault": "[RankPerms] §aSuccess to set rank default!",
 
     "rankperms.success.addinheritance": "[RankPerms] §aSuccess to add inheritance!",
     "rankperms.success.addpermission": "[RankPerms] §aSuccess to add permission!",
@@ -131,6 +137,8 @@ Translate.createLanguage("en-US", {
     "playerrank.error.notfound.player": "[PlayerRank] §cPlayer Id not found!",
     "playerrank.error.notfound.rank": "[PlayerRank] §cRank Id not found!",
     "playerrank.error.already": "[PlayerRank] §cAlready!",
+
+    "playerrank.success.setplayerrank": "[PlayerRank] §aSuccess to set player rank!",
 
     "form-ui.buttons.confirm": "§8[ §aCONFIRM §8]",
     "form-ui.buttons.cancel": "§8[ §cCANCEL §8]",

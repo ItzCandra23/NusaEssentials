@@ -68,7 +68,7 @@ class PlayerRank {
             let dataplayers = PlayerRank.getPlayers();
 
             if (!PlayerData.getPlayerName(playerId)) return reject("playerrank.error.notfound.player");
-            if (!ranks.hasOwnProperty(rankId)) return reject("playerrank.error.notfound.rank");
+            if (!ranks.includes(rankId)) return reject("playerrank.error.notfound.rank");
             if (PlayerRank.getRankId(playerId) === rankId) return reject("playerrank.error.already");
 
             let data: PlayerRankChangeEvent = {
